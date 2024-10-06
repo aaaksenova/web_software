@@ -9,20 +9,30 @@
     <!-- Form to add a new course -->
     <form method="POST" action="/courses">
       <label for="name">Course name:</label>
-      <input type="text" id="name" name="name" required />
+      <input type="text" id="name" name="name" value=<%= it?.name ?? '' %> >
       <button type="submit">Add</button>
     </form>
 
+    <ul>
+      <% if (it?.errors?._errors) { %>
+        <% it.errors._errors.forEach((error) => { %>
+          <li><%= error %></li>
+        <% }); %>
+      <% } %>
+    </ul>
+
     <h2>Existing Courses</h2>
     <ul>
-      <% it.courses.forEach((course) => { %>
-        <li>
-          <a href="/courses/<%= course.id %>"><%= course.name %></a>
-          <form method="POST" action="/courses/<%= course.id %>/delete">
-            <button type="submit">Delete</button>
-          </form>
-        </li>
-      <% }) %>
+      <% if (it?.courses) { %>
+        <% it.courses.forEach((course) => { %>
+          <li>
+            <a href="/courses/<%= course.id %>"><%= course.name %></a>
+            <form method="POST" action="/courses/<%= course.id %>/delete">
+              <button type="submit">Delete</button>
+            </form>
+          </li>
+        <% }) %>
+      <% } %>
     </ul>
   </body>
 </html>

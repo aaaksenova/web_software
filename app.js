@@ -1,29 +1,23 @@
 import { Hono } from "https://deno.land/x/hono@v3.12.11/mod.ts";
-import * as feedbacks from "./feedbacks.js";
 import { Eta } from "https://deno.land/x/eta@v3.4.0/src/index.ts";
+import * as feedbackController from "./feedbackController.js";
 
-const app = new Hono();
 const eta = new Eta({ views: `${Deno.cwd()}/templates/` });
+const app = new Hono();
 
-// Serve the index page
-app.get("/", async (c) => {
-  const html = await eta.render("index.eta");
-  return c.html(html);
-});
+// Serve the index page with feedback buttons
+// app.get("/", feedbackController.showFeedbackForm);
 
-// Show the feedback count
-app.get("/feedbacks/:id", async (c) => {
-  const id = c.req.param("id");
-  const feedbackCount = await feedbacks.getFeedbackCount(id);
-  return c.text(`Feedback ${id}: ${feedbackCount}`);
-});
 
-// Handle feedback POST with Redirect pattern
-app.post("/feedbacks/:id", async (c) => {
-  const id = c.req.param("id");
-  await feedbacks.incrementFeedbackCount(id);
-  // Redirect to root after submitting feedback
-  return c.redirect("/");
-});
+
+// Course-specific routes (viewing, adding, and deleting courses)
+app.get("/courses", feedbackController.showCourses);
+app.post("/courses", feedbackController.addCourse);
+app.get("/courses/:courseId", feedbackController.showCourse);
+app.post("/courses/:courseId/delete", feedbackController.deleteCourse);
+
+// Feedback-specific routes (showing feedback count, handling feedback post)
+app.post("/courses/:courseId/feedbacks/:feedbackType", feedbackController.postCourseFeedback);
+app.get("/courses/:courseId/feedbacks/:feedbackType", feedbackController.getCourseFeedback);
 
 export default app;
